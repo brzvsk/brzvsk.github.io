@@ -47,7 +47,7 @@
       // Combine text
       const existingText = textArea.value;
       const newText =
-        quotes.join("\n") + (existingText ? "\n" + existingText : "");
+        quotes.join("\n\n") + (existingText ? "\n\n" + existingText : "");
 
       // Update textarea
       await new Promise((resolve) => {
@@ -217,7 +217,28 @@
     }
   });
 
-  document.addEventListener("scroll", hideQuotePopover);
+  // Enhanced scroll handling
+  // Handle window scroll
+  window.addEventListener("scroll", hideQuotePopover, true);
+
+  // Handle any scrollable element's scroll
+  document.addEventListener(
+    "scroll",
+    (e) => {
+      if (quotePopover.style.display !== "none") {
+        hideQuotePopover();
+      }
+    },
+    true,
+  );
+
+  // Optional: Handle scroll on specific containers that might have their own scroll
+  const scrollableContainers = document.querySelectorAll(
+    ".overflow-auto, .overflow-y-auto, .overflow-scroll",
+  );
+  scrollableContainers.forEach((container) => {
+    container.addEventListener("scroll", hideQuotePopover, true);
+  });
 
   // Enhanced keyboard event listener
   document.addEventListener(
