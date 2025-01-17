@@ -1,6 +1,4 @@
 (() => {
-  console.log("Quote script initialized");
-
   // Create and append popover element
   const quotePopover = document.createElement("div");
   quotePopover.className =
@@ -12,24 +10,8 @@
   let selectedText = "";
   let isProcessingQuotes = false;
 
-  // Debug helper function
-  function debugReactState(textarea) {
-    const reactKey = Object.keys(textarea).find((k) =>
-      k.startsWith("__reactProps$"),
-    );
-    const fiber = textarea["__reactFiber$" + reactKey.split("$")[1]];
-
-    console.log("React textarea state:", {
-      hasOnChange: !!textarea[reactKey]?.onChange,
-      value: textarea.value,
-      fiberStateNode: fiber?.stateNode === textarea,
-      memoizedProps: fiber?.memoizedProps,
-    });
-  }
-
   // Enhanced quote processing and sending function
   async function processQuotesAndSend(textArea, quoteLabels) {
-    console.log("Processing quotes and sending...");
     try {
       // Get quotes
       const quotes = Array.from(quoteLabels).map((label) => {
@@ -40,9 +22,6 @@
           "";
         return `> ${fullQuote}`;
       });
-
-      // Debug current state
-      debugReactState(textArea);
 
       // Combine text
       const existingText = textArea.value;
@@ -66,13 +45,8 @@
         textArea.value = newText;
         textArea.dispatchEvent(new Event("input", { bubbles: true }));
         textArea.dispatchEvent(new Event("change", { bubbles: true }));
-
-        // Give React a chance to update
         requestAnimationFrame(resolve);
       });
-
-      // Debug after update
-      debugReactState(textArea);
 
       // Remove quote labels
       quoteLabels.forEach((label) => label.remove());
@@ -94,11 +68,6 @@
     const responseBlock = e.target.closest(
       '[data-element-id="response-block"]',
     );
-    console.log("ShowQuotePopover triggered:", {
-      hasSelection: !!selection,
-      responseBlock: !!responseBlock,
-      isCollapsed: selection?.isCollapsed,
-    });
 
     if (selection && responseBlock && !selection.isCollapsed) {
       let range = selection.getRangeAt(0);
@@ -114,7 +83,7 @@
           const scrollTop =
             window.pageYOffset || document.documentElement.scrollTop;
           quotePopover.style.left = `${rect.left + rect.width / 2 - 15}px`;
-          quotePopover.style.top = `${scrollTop + rect.top - 45}px`;
+          quotePopover.style.top = `${scrollTop + rect.top - 50}px`;
           quotePopover.style.display = "block";
 
           quotePopover.onclick = () => {
@@ -134,7 +103,6 @@
   }
 
   function addQuoteLabel(quote) {
-    console.log("Adding quote label for:", quote);
     if (!quote) quote = "text";
 
     const originalQuote = quote;
@@ -218,10 +186,7 @@
   });
 
   // Enhanced scroll handling
-  // Handle window scroll
   window.addEventListener("scroll", hideQuotePopover, true);
-
-  // Handle any scrollable element's scroll
   document.addEventListener(
     "scroll",
     (e) => {
@@ -232,7 +197,6 @@
     true,
   );
 
-  // Optional: Handle scroll on specific containers that might have their own scroll
   const scrollableContainers = document.querySelectorAll(
     ".overflow-auto, .overflow-y-auto, .overflow-scroll",
   );
@@ -252,14 +216,6 @@
         !e.shiftKey &&
         document.activeElement === textArea
       ) {
-        console.log("Enter key intercepted:", {
-          hasQuotes:
-            document.querySelectorAll(
-              '[data-element-id="inline-character-label"]',
-            ).length > 0,
-          textareaValue: textArea.value,
-        });
-
         const quoteLabels = document.querySelectorAll(
           '[data-element-id="inline-character-label"]',
         );
